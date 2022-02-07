@@ -1,0 +1,78 @@
+from nltk import word_tokenize
+from nltk.corpus import stopwords
+import re
+import advertools as adv
+from api.nltk.stop_word.languages_stop_word import *
+class KeywordExtraction(viewsets.ViewSet):
+    def create(self , request):
+        data        = request.data
+        sentence    = data['sentence']
+        language = detect(sentence) # detect Language
+        
+        sentence = re.sub(r'[^\w\s]', '', sentence) # Remove punctuation
+        sentence = ''.join([i for i in sentence if not i.isdigit()]) # Remove Number
+        
+        # ======== All in one
+        list_of_stop_word = all_languages_stop_word[language]
+        sentence = sentence.split()
+        sentence = key_word_extract(list_of_stop_word, sentence)
+        
+        
+        
+        
+        if language == "en":
+            stop = set(stopwords.words('english'))
+            sentence = [i for i in sentence.lower().split() if i not in stop]
+        elif language == "hi":
+            list_of_stop_word = sorted(adv.stopwords['hindi'])
+            sentence = sentence.split()
+            # sentence = set(sentence) - set(list_of_stop_word)
+            sentence = key_word_extract(list_of_stop_word, sentence)
+        elif language == "ja":
+            list_of_stop_word = sorted(adv.stopwords['japanese']) # list of stopword
+            sentence = sentence.split()
+            # sentence = set(sentence) - set(list_of_stop_word) # remove stop word from sentence list
+            # sentence = list(sentence)
+            sentence = key_word_extract(list_of_stop_word, sentence)
+        elif language == "de":
+            list_of_stop_word = sorted(adv.stopwords['german'])  # list of stopword
+            sentence = sentence.split()
+            sentence = key_word_extract(list_of_stop_word, sentence)
+
+        elif language == "it":
+            list_of_stop_word = sorted(adv.stopwords['italian'])  # list of stopword
+            sentence = sentence.split()
+            sentence = key_word_extract(list_of_stop_word, sentence)
+
+        elif language == "fr":
+            list_of_stop_word = sorted(adv.stopwords['French'])  # list of stopword
+            sentence = sentence.split()
+            sentence = key_word_extract(list_of_stop_word, sentence)
+        elif language == "pt":
+            list_of_stop_word = sorted(adv.stopwords['portuguese'])  # list of stopword
+            sentence = sentence.split()
+            sentence = key_word_extract(list_of_stop_word, sentence)
+        #_______ Start Indian Languages ___________
+        elif language == "mr":
+            list_of_stop_word = marathi_stop_word  # list of stopword
+            sentence = sentence.split()
+            sentence = key_word_extract(list_of_stop_word, sentence)
+        elif language == "hi":
+            list_of_stop_word = hindi_stop_word  # list of stopword
+            sentence = sentence.split()
+            sentence = key_word_extract(list_of_stop_word, sentence)
+        elif language == 'bn':
+            list_of_stop_word = sorted(adv.stopwords['bengali'])  # list of stopword
+            sentence = sentence.split()
+            sentence = key_word_extract(list_of_stop_word, sentence)
+            
+        else:
+            list_of_stop_word = all_languages_stop_word[language]
+            sentence = sentence.split()
+            sentence = key_word_extract(list_of_stop_word, sentence)
+            
+        context = {
+            "Message":success,
+            "Output":sentence
+        }
+        return  Response(context)
